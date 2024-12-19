@@ -607,4 +607,10 @@ class MediaChain(ChainBase, metaclass=Singleton):
                                 if content:
                                     __save_file(_fileitem=fileitem, _path=image_path, _content=content)
 
+        # 刮削完成事件
+        self.eventmanager.send_event(EventType.MetadataScrapeComplete, {
+            'meta': meta,
+            'mediainfo': mediainfo,
+            'fileitem': fileitem
+        })
         logger.info(f"{filepath.name} 刮削完成")
