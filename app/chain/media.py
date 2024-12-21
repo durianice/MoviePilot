@@ -317,6 +317,12 @@ class MediaChain(ChainBase, metaclass=Singleton):
         try:
             # 执行刮削
             self.scrape_metadata(fileitem=fileitem, meta=meta, mediainfo=mediainfo)
+            # 刮削主程结束
+            self.eventmanager.send_event(EventType.MetadataScrapeComplete, {
+                'meta': meta,
+                'mediainfo': mediainfo,
+                'fileitem': fileitem
+            })
         finally:
             # 释放锁
             with scraping_lock:
@@ -606,11 +612,4 @@ class MediaChain(ChainBase, metaclass=Singleton):
                                 # 保存图片文件到当前目录
                                 if content:
                                     __save_file(_fileitem=fileitem, _path=image_path, _content=content)
-
-        # 刮削完成事件
-        self.eventmanager.send_event(EventType.MetadataScrapeComplete, {
-            'meta': meta,
-            'mediainfo': mediainfo,
-            'fileitem': fileitem
-        })
         logger.info(f"{filepath.name} 刮削完成")
