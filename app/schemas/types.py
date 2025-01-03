@@ -56,8 +56,6 @@ class EventType(Enum):
     SystemError = "system.error"
     # 刮削元数据
     MetadataScrape = "metadata.scrape"
-    # 刮削完成
-    MetadataScrapeComplete = "metadata.scrape.complete"
     # 模块需要重载
     ModuleReload = "module.reload"
 
