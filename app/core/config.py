@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Optional, Tuple, Type
 from dotenv import set_key
 from pydantic import BaseModel, BaseSettings, validator, Field
 
-from app.log import logger
+from app.log import logger, log_settings, LogConfigModel
 from app.utils.system import SystemUtils
 from app.utils.url import UrlUtils
 
@@ -240,9 +240,11 @@ class ConfigModel(BaseModel):
     RENAME_FORMAT_S0_NAMES: List[str] = Field(
         default_factory=lambda: ["Specials", "SPs"]
     )
+    # 启用分词搜索
+    TOKENIZED_SEARCH: bool = False
 
 
-class Settings(BaseSettings, ConfigModel):
+class Settings(BaseSettings, ConfigModel, LogConfigModel):
     """
     系统配置类
     """
@@ -404,6 +406,8 @@ class Settings(BaseSettings, ConfigModel):
                 # 仅成功更新配置时，才更新内存
                 if success:
                     setattr(self, key, converted_value)
+                    if hasattr(log_settings, key):
+                        setattr(log_settings, key, converted_value)
                 return success, message
             return True, ""
         except Exception as e:
@@ -414,8 +418,14 @@ class Settings(BaseSettings, ConfigModel):
         更新多个配置项
         """
         results = {}
+        log_updated = False
         for k, v in env.items():
             results[k] = self.update_setting(k, v)
+            if hasattr(log_settings, k):
+                log_updated = True
+        # 本次更新存在日志配置项更新，需要重新加载日志配置
+        if log_updated:
+            logger.update_loggers()
         return results
 
     @property
@@ -481,6 +491,7 @@ class Settings(BaseSettings, ConfigModel):
                 "refresh": 100,
                 "tmdb": 1024,
                 "douban": 512,
+                "bangumi": 512,
                 "fanart": 512,
                 "meta": (self.META_CACHE_EXPIRE or 24) * 3600
             }
@@ -489,6 +500,7 @@ class Settings(BaseSettings, ConfigModel):
             "refresh": 50,
             "tmdb": 256,
             "douban": 256,
+            "bangumi": 256,
             "fanart": 128,
             "meta": (self.META_CACHE_EXPIRE or 2) * 3600
         }

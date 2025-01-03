@@ -1,13 +1,13 @@
 import traceback
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from typing import Union, Optional, List, Self
 
 import cn2an
 import regex as re
 
 from app.log import logger
-from app.utils.string import StringUtils
 from app.schemas.types import MediaType
+from app.utils.string import StringUtils
 
 
 @dataclass
@@ -589,9 +589,10 @@ class MetaBase(object):
         """
         转为字典
         """
-        dicts = asdict(self)
+        dicts = vars(self).copy()
         dicts["type"] = self.type.value if self.type else None
         dicts["season_episode"] = self.season_episode
         dicts["edition"] = self.edition
         dicts["name"] = self.name
+        dicts["episode_list"] = self.episode_list
         return dicts

@@ -16,8 +16,7 @@ from app.helper.module import ModuleHelper
 from app.log import logger
 from app.modules import _ModuleBase
 from app.modules.filemanager.storages import StorageBase
-from app.schemas import TransferInfo, ExistMediaInfo, TmdbEpisode, TransferDirectoryConf, FileItem, StorageUsage
-from app.schemas.event import TransferRenameEventData
+from app.schemas import TransferInfo, ExistMediaInfo, TmdbEpisode, TransferDirectoryConf, FileItem, StorageUsage, TransferRenameEventData
 from app.schemas.types import MediaType, ModuleType, ChainEventType, OtherModulesType
 from app.utils.system import SystemUtils
 
@@ -609,12 +608,12 @@ class FileManagerModule(_ModuleBase):
                        r"|chinese|(cn|ch[si]|sg|zho?|eng)[-_&]?(cn|ch[si]|sg|zho?|eng)" \
                        r"|简[体中]?)[.\])])" \
                        r"|([\u4e00-\u9fa5]{0,3}[中双][\u4e00-\u9fa5]{0,2}[字文语][\u4e00-\u9fa5]{0,3})" \
-                       r"|简体|简中|JPSC" \
+                       r"|简体|简中|JPSC|sc_jp" \
                        r"|(?<![a-z0-9])gb(?![a-z0-9])"
         _zhtw_sub_re = r"([.\[(](((zh[-_])?(hk|tw|cht|tc))" \
                        r"|(cht|eng)[-_&]?(cht|eng)" \
                        r"|繁[体中]?)[.\])])" \
-                       r"|繁体中[文字]|中[文字]繁体|繁体|JPTC" \
+                       r"|繁体中[文字]|中[文字]繁体|繁体|JPTC|tc_jp" \
                        r"|(?<![a-z0-9])big5(?![a-z0-9])"
         _eng_sub_re = r"[.\[(]eng[.\])]"
 
@@ -1185,7 +1184,7 @@ class FileManagerModule(_ModuleBase):
             # 集号
             "episode": meta.episode_seqs,
             # 季集 SxxExx
-            "season_episode": "%s%s" % (meta.season, meta.episodes),
+            "season_episode": "%s%s" % (meta.season, meta.episode),
             # 段/节
             "part": meta.part,
             # 剧集标题
